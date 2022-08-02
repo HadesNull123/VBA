@@ -1,0 +1,48 @@
+Option Explicit
+
+Sub winHttpRequest()
+
+Dim xmlhttp As Object
+Dim myURL As String
+Dim getPageText As String
+Dim getStatus As String
+Dim lastRow As Long, i As Long
+Dim arr As Variant
+
+With ThisWorkbook.Sheets(ActiveSheet.Index)
+    lastRow = .Cells(Rows.Count, 1).End(xlUp).Row
+    arr = .Range(.Cells(1, 1), .Cells(lastRow, 1))
+
+    For i = 2 To UBound(arr)
+    
+        myURL = "https://" & arr(i, 1)
+        
+        On Error Resume Next
+        
+        Set xmlhttp = CreateObject("WinHttp.WinHttpRequest.5.1")
+        
+        xmlhttp.Option(6) = False
+        xmlhttp.Open "GET", myURL, False
+        xmlhttp.send
+        
+        If Err.Number <> 0 Then
+            Cells(i, 3).Value = "Unknow Error"
+			Cells(i, 3).Interior.ColorIndex = 3
+        Else
+            getStatus = xmlhttp.Status
+			Cells(i, 3).Value = getStatus
+			Cells(i, 3).Interior.ColorIndex = 4
+        End If
+        
+        On Error GoTo 0
+        
+        Set xmlhttp = Nothing
+
+    Next i
+    
+End With
+
+End Sub
+
+
+
